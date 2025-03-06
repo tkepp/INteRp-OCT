@@ -1,8 +1,16 @@
 # Bridging Gaps in Retinal Imaging
 ***Fusing OCT and SLO Information with Implicit Neural Representations for Improved Interpolation and Segmentation***
-
-
-## Citation and Contribution
+## Prerequisites
+## Getting Started
+### Installation
+### Datasets
+<!--### Structure-->
+## Usage
+### Preprocessing
+### Training
+### Test
+## Citation
+This work has been accepted for the German Conference on Medical Image Computing 2025. If you use this code, please cite as follows:
 ```
 @inproceedings{kepp2025interp_oct,
   title={Bridging gaps in retinal imaging},
