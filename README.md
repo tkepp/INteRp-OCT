@@ -1,5 +1,5 @@
 # Bridging Gaps in Retinal Imaging
-## Fusing OCT and SLO Information with Implicit Neural Representations for Improved Interpolation and Segmentation
+***Fusing OCT and SLO Information with Implicit Neural Representations for Improved Interpolation and Segmentation***
 
 
 ## Citation and Contribution
