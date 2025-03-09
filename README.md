@@ -29,7 +29,7 @@ unseen cases.
 - lpips
 - scikit-image
 
-&#8594; A requirements.txt will be added
+&#8594; A requirements.txt will be added soon!
 
 ## Getting Started
 ### Installation
