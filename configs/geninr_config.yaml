@@ -1,0 +1,63 @@
+SETTINGS:
+  PROJECT_NAME: 'GenFitOCT'
+  RESULT_DIR: '' # result directory will be stored here. Must be created in advance.
+  IMG_DIR: '' # directory where the image container files are stored
+  FOLD: 1
+
+PREPROCESSING:
+  BSCAN_SUBSAMPLE_FACTOR: 32 # 16
+
+TRAINING:
+  LATENT_CODE:
+    SIZE: 128
+    INIT_STD: 0.01
+  NUM_SAMPLES: 80
+  SEED: 25
+  LEARNING_RATE: 0.0001
+  TOTAL_EPOCHS: 1500
+  EPOCHS_TIL_SUMMARY: 10
+  LOSS_RECON: 'Combi' # 'MSE', 'SSIM' or 'Combi'
+  LOSS_WEIGHT_RECON: 5.0
+  LOSS_WEIGHT_SEG: 1.0
+  INPUT_SLO: True
+
+MODEL:
+  # GENERAL
+  NUM_LAYERS: 6
+  HIDDEN_SIZE: 128
+  DROPOUT: 0.0
+  NUM_CLASSES: 13
+  ACTIVATION: 'WIRE' # 'SIREN', 'WIRE', 'RELU', 'FINER'
+  MODULATION: False #Note: Only plain MLP with Siren
+  SKIP_CONNECTION: True
+  INPUT_COORD_TO_ALL_LAYERS: True
+
+POS_ENCODING:
+  TYPE: 'None' #'None', 'FF', 'Hashgrid'
+  HASHGRID:
+    DIM: 3
+    N_LEVELS: 16
+    N_FEATURES_PER_LEVEL: 2
+    LOG2_HASHMAP_SIZE: 15
+    BASE_RESOLUTION: 16
+    FINEST_RESOLUTION: 512
+  FF:
+    MAPPING_SIZE: 256 # each per cos/sine
+    SCALE: 1.0
+    FACTOR: 1.0
+  SIREN:
+    OMEGA_0: 30
+  WIRE:
+    SCALE_0: 10
+    OMEGA_0: 30
+  FINER:
+    OMEGA_0: 30
+    SCALE_0: 10
+    SCALE_REQ_GRAD: False
+TEST:
+  NUM_SAMPLES: 1
+  LATENT_CODE:
+    INIT_STD: 0.0001
+  TOTAL_EPOCHS: 200
+  EPOCHS_TIL_SUMMARY: 50
+  LEARNING_RATE: 0.001
