@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import time
-from utils import turn_to_onehot, get_train_indices, AverageMeter, EarlyStopping, SSIMLoss, COMBILoss
+from utils import turn_to_onehot, get_train_indices, AverageMeter, EarlyStopping, SSIMLoss, COMBILoss, normalize
 from evaluation import compute_smooth_dice
 from random import shuffle
 from plots import plot_step_summary, plot_step_summary_oct_with_seg, plot_step_summary_oct_with_seg_single

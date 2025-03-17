@@ -9,8 +9,9 @@ import numpy as np
 import os
 import torch
 import torch.nn as nn
-from data_utils import save_as_itk, normalize
+from utils import save_as_itk, normalize
 from plots import plot_final_summary, plot_final_summary_oct
+from scipy.ndimage import distance_transform_edt
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from utils import turn_to_onehot, AverageMeter
 
@@ -97,7 +98,7 @@ def compute_smooth_dice(y_pred, y_true, eps=1e-12):
     return (2*y_pred*y_true+eps).sum()/((y_pred.abs()+y_true.abs()).sum()+eps)
 
 
-def calculate_eval_metrics(gt_img, recon_img, mode='2D', device='cpu'):
+def calculate_regr_metrics(gt_img, recon_img, mode='2D', device='cpu'):
     # Mode can be either 2D or 3D (only relevant for 3D inputs)
     # 2D: Metrics are calculated per B-Scan and then averaged
     # 3D: Metrics are calculated on the entire image volume
@@ -155,6 +156,86 @@ def calculate_eval_metrics(gt_img, recon_img, mode='2D', device='cpu'):
     for name, value in metrics.items():
         print('{}: {:.6f}'.format(name, value))
     print('\n')
+    return metrics
+
+
+def surfd(seg1, seg2, sampling=1):
+    H, W = seg1.shape
+    upper_border1 = np.zeros((H, W))
+    inds1 = np.argmax(seg1, 0)
+    upper_border1[inds1, np.linspace(0, W - 1, W).astype(int)] = 1
+    upper_border1[0, :] = 0
+
+    upper_border2 = np.zeros((H, W))
+    inds2 = np.argmax(seg2, 0)
+    upper_border2[inds2, np.linspace(0, W - 1, W).astype(int)] = 1
+    upper_border2[0, :] = 0
+
+    input1 = upper_border1.copy().astype(bool)
+    input2 = upper_border2.copy().astype(bool)
+
+    dt1 = distance_transform_edt(~input1, sampling)
+    dt2 = distance_transform_edt(~input2, sampling)
+
+    sds = np.concatenate([np.ravel(dt1[input2 != 0]), np.ravel(dt2[input1 != 0])])
+
+    return sds
+
+
+def calculate_segm_metrics(gt_seg, pred_seg, sampling=1):
+
+    metrics = {}
+
+    H, W, D = gt_seg.shape
+
+    dices = []
+    assds = []
+    hds95 = []
+    hds = []
+
+    for slice in range(D):
+
+        per_label_dices = []
+        per_label_assds = []
+        per_label_hds95 = []
+        per_label_hds = []
+
+        gt_slice = gt_seg[..., slice]
+        pred_slice = pred_seg[..., slice]
+
+        for label in range(1, int(gt_seg.max() + 1)):
+            binary_gt = 1. * (gt_slice == label).T
+            binary_pred = 1. * (pred_slice == label).T
+
+            dice = compute_smooth_dice(binary_gt, binary_pred)
+            per_label_dices.append(dice)
+
+            try:
+                sds = surfd(binary_gt, binary_pred, sampling=sampling)
+            except:
+                print('Distance calculation failed for label ' + str(label) + '!')
+                continue
+
+            if not len(sds):
+                print('Distance calculation delivered empty result for label ' + str(label) + '!')
+            else:
+                assd = sds.mean()
+                per_label_assds.append(assd)
+                hd95 = np.percentile(sds, 95)
+                per_label_hds95.append(hd95)
+                hd = sds.max()
+                per_label_hds.append(hd)
+
+        dices.append(np.array(per_label_dices).mean())
+        assds.append(np.array(per_label_assds).mean())
+        hds95.append(np.array(per_label_hds95).mean())
+        hds.append(np.array(per_label_hds).mean())
+
+    metrics['DICE'] = np.array(dices).mean()
+    metrics['ASSD'] = np.array(assds).mean()
+    metrics['HD 95'] = np.array(hds95).mean()
+    metrics['HD'] = np.array(hds).mean()
+
     return metrics
 
 
@@ -281,12 +362,12 @@ def eval_oct_inr_gen_octa(coords, latent_codes, model, reconstruction_head, segm
 
             # Evaluate performance for reconstructed and interpolated B-Scans
             print('\nEvaluating reconstruction of OCT B-scans:')
-            metrics = calculate_eval_metrics(oct_vol[..., idx_train], pred_oct_vol[..., idx_train], mode='2D')
+            metrics = calculate_regr_metrics(oct_vol[..., idx_train], pred_oct_vol[..., idx_train], mode='2D')
             with open(os.path.join(metric_results_path, 'recon_results_OCT_smpl{}.pkl'.format(idx_smpl)), 'wb') as f:
                 pickle.dump(metrics, f)
 
             print('Evaluating interpolated OCT B-scans:')
-            metrics = calculate_eval_metrics(oct_vol[..., idx_interp], pred_oct_vol[..., idx_interp], mode='2D')
+            metrics = calculate_regr_metrics(oct_vol[..., idx_interp], pred_oct_vol[..., idx_interp], mode='2D')
             with open(os.path.join(metric_results_path, 'interp_results_OCT_smpl{}.pkl'.format(idx_smpl)), 'wb') as f:
                 pickle.dump(metrics, f)
 
@@ -416,12 +497,12 @@ def eval_oct_inr_single_octa(coords, model, reconstruction_head, segmentation_he
 
             # Evaluate performance for reconstructed and interpolated B-Scans
             print('\nEvaluating reconstruction of OCT B-scans:')
-            metrics = calculate_eval_metrics(oct_vol[..., idx_train], pred_oct_vol[..., idx_train], mode='2D')
+            metrics = calculate_regr_metrics(oct_vol[..., idx_train], pred_oct_vol[..., idx_train], mode='2D')
             with open(os.path.join(metric_results_path, f'recon_results_OCT_smpl{subject_name}.pkl'), 'wb') as f:
                 pickle.dump(metrics, f)
 
             print('Evaluating interpolated OCT B-scans:')
-            metrics = calculate_eval_metrics(oct_vol[..., idx_interp], pred_oct_vol[..., idx_interp], mode='2D')
+            metrics = calculate_regr_metrics(oct_vol[..., idx_interp], pred_oct_vol[..., idx_interp], mode='2D')
             with open(os.path.join(metric_results_path, 'interp_results_OCT_smpl{subject_name}.pkl'), 'wb') as f:
                 pickle.dump(metrics, f)
 

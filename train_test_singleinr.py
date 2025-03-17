@@ -11,7 +11,7 @@ from utils import set_gpu, read_yaml, write_dict_as_yaml, get_mgrid
 from model.layer_activations import Sine, WIRE, Relu, FINER
 from model.mlp import (MLP, ResMLP, MLPHiddenCoords, ResMLPHiddenCoords, SegmentationHead, ModulatedSiren,
                        ReconstructionHead, SegmentationHeadSDM, Siren)
-from mapper import MultiResHashGrid, MapperNoEncoding, MapperFF
+from model.mapper import MultiResHashGrid, MapperNoEncoding, MapperFF
 from training import train_oct_inr_single_octa
 from evaluation import eval_oct_inr_single_octa
 
