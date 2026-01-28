@@ -1,63 +1,74 @@
 SETTINGS:
-  PROJECT_NAME: 'GenFitOCT'
-  RESULT_DIR: '' # result directory will be stored here. Must be created in advance.
-  IMG_DIR: '' # directory where the image container files are stored
-  FOLD: 1
+  # General settings
+  PROJECT_NAME: 'GenFitOCT'       # Name of the project / experiment
+  RESULT_DIR: ''                  # Directory to store results (must exist)
+  IMG_DIR: ''                     # Directory containing image container files
+  FOLD: 1                         # Training / test fold index
 
 PREPROCESSING:
-  BSCAN_SUBSAMPLE_FACTOR: 32 # 16
+  BSCAN_SUBSAMPLE_FACTOR: 32      # Subsampling factor for B-scans
 
 TRAINING:
+  # Training settings
   LATENT_CODE:
-    SIZE: 128
-    INIT_STD: 0.01
-  NUM_SAMPLES: 80
-  SEED: 25
-  LEARNING_RATE: 0.0001
-  TOTAL_EPOCHS: 1500
-  EPOCHS_TIL_SUMMARY: 10
-  LOSS_RECON: 'Combi' # 'MSE', 'SSIM' or 'Combi'
-  LOSS_WEIGHT_RECON: 5.0
-  LOSS_WEIGHT_SEG: 1.0
-  INPUT_SLO: True
+    SIZE: 128                     # Dimensionality of latent vector
+    INIT_STD: 0.01                # Initialization std for latent codes
+  NUM_SAMPLES: 80                 # Number of samples per training iteration
+  SEED: 25                        # Random seed
+  LEARNING_RATE: 0.0001           # Learning rate for optimization
+  TOTAL_EPOCHS: 1500              # Maximum number of training epochs
+  EPOCHS_TIL_SUMMARY: 10          # Epochs between summaries / plots
+  LOSS_RECON: 'Combi'             # Reconstruction loss: 'MSE', 'SSIM', or 'Combi'
+  LOSS_WEIGHT_RECON: 5.0          # Weight of reconstruction loss
+  LOSS_WEIGHT_SEG: 1.0            # Weight of segmentation loss
+  INPUT_SLO: True                 # Use SLO input (True / False)
 
 MODEL:
-  # GENERAL
-  NUM_LAYERS: 6
-  HIDDEN_SIZE: 128
-  DROPOUT: 0.0
-  NUM_CLASSES: 13
-  ACTIVATION: 'WIRE' # 'SIREN', 'WIRE', 'RELU', 'FINER'
-  MODULATION: False #Note: Only plain MLP with Siren
-  SKIP_CONNECTION: True
-  INPUT_COORD_TO_ALL_LAYERS: True
+  # General network settings
+  NUM_LAYERS: 6                   # Number of hidden layers
+  HIDDEN_SIZE: 128                # Width of hidden layers
+  DROPOUT: 0.0                    # Dropout rate
+  NUM_CLASSES: 13                 # Number of segmentation classes
+  ACTIVATION: 'WIRE'              # Activation: 'SIREN', 'WIRE', 'RELU', 'FINER'
+  MODULATION: False               # Use modulated SIREN (only plain MLP supported)
+  SKIP_CONNECTION: True           # Enable skip connections
+  INPUT_COORD_TO_ALL_LAYERS: True # Pass input coordinates to all layers
 
 POS_ENCODING:
-  TYPE: 'None' #'None', 'FF', 'Hashgrid'
-  HASHGRID:
-    DIM: 3
-    N_LEVELS: 16
-    N_FEATURES_PER_LEVEL: 2
-    LOG2_HASHMAP_SIZE: 15
-    BASE_RESOLUTION: 16
-    FINEST_RESOLUTION: 512
-  FF:
-    MAPPING_SIZE: 256 # each per cos/sine
-    SCALE: 1.0
-    FACTOR: 1.0
-  SIREN:
-    OMEGA_0: 30
-  WIRE:
-    SCALE_0: 10
-    OMEGA_0: 30
-  FINER:
-    OMEGA_0: 30
-    SCALE_0: 10
-    SCALE_REQ_GRAD: False
+  # Configuration of positional encoding
+
+  TYPE: 'None'                    # Positional encoding type: 'None', 'FF', 'Hashgrid'
+
+  HASHGRID:                       # Hashgrid encoding
+    DIM: 3                        # Input dimensionality
+    N_LEVELS: 16                  # Number of hashgrid levels
+    N_FEATURES_PER_LEVEL: 2       # Features per level
+    LOG2_HASHMAP_SIZE: 15         # Log2 of hashmap size
+    BASE_RESOLUTION: 16           # Coarsest grid resolution
+    FINEST_RESOLUTION: 512        # Finest grid resolution
+
+  FF:                             # Fourier feature encoding
+    MAPPING_SIZE: 256             # Mapping size (per sine/cosine)
+    SCALE: 1.0                    # Fourier feature scale
+    FACTOR: 1.0                   # Fourier feature factor
+
+  SIREN:                          # SIREN-specific parameters
+    OMEGA_0: 30                   # Base frequency
+
+  WIRE:                           # WIRE-specific parameters
+    SCALE_0: 10                   # Scale parameter
+    OMEGA_0: 30                   # Frequency parameter
+
+  FINER:                          # FINER-specific parameters
+    OMEGA_0: 30                   # Base frequency
+    SCALE_0: 10                   # Scale parameter
+    SCALE_REQ_GRAD: False         # Enable gradient for scale parameter
+
 TEST:
-  NUM_SAMPLES: 1
+  # Test settings
+  NUM_SAMPLES: 1                  # Number of test samples
   LATENT_CODE:
-    INIT_STD: 0.0001
-  TOTAL_EPOCHS: 200
-  EPOCHS_TIL_SUMMARY: 50
-  LEARNING_RATE: 0.001
+    INIT_STD: 0.0001              # Init std for test latent codes
+  TOTAL_EPOCHS: 200               # Optimization steps for test latent fitting
+  EPOCHS_TIL_SUMMARY: 50          # Epochs between test summaries
+  LEARNING_RATE: 0.001            # Learning rate for test optimization

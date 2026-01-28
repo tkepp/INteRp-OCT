@@ -29,8 +29,6 @@ unseen cases.
 - lpips
 - scikit-image
 
-&#8594; A requirements.txt will be added soon!
-
 ## Getting Started
 ### Installation
 - Clone this repository
@@ -38,8 +36,7 @@ unseen cases.
 
 ### Dataset
 The dataset used for INteRp-OCT consists of 100 OCT and SLO images from 50 healthy volunteers (right and left eye) 
-acquired with a Heidelberg Spectralis scanner. OCT and SLO images have a resolution of 496x512x512 (dense sampling in OCTA setting) and 768x768. 
-
+acquired with a Heidelberg Spectralis scanner. OCT and SLO images have a resolution of 496x512x512 (dense sampling in OCTA setting) and 768x768.
 
 ### Preprocessing
 Pre-processing of the OCT images consists of the following steps:
@@ -88,45 +85,7 @@ python train_test_geninr.py ../configs/geninr_config.yaml --gpu 0
 python train_test_single.py ../configs/singleinr_config.yaml --gpu 0
 ```
 
-For both generalizable and single INR, we provide config-files with the settings used in the paper.
-With the config-files you can define:
-
-### **General Settings**
-- **`SETTINGS.FOLD`**: The training/test fold  
-- **`SETTINGS.RESULT_DIR`**: Directory to store results  
-- **`SETTINGS.IMG_DIR`**: Directory containing dataset containers  
-
-### **Training Settings**
-- **`TRAINING.LATENT_CODE.SIZE`**: Number of elements in each latent vector  
-- **`TRAINING.LATENT_CODE.INIT_STD`**: Standard deviation for initializing latent codes  
-- **`TRAINING.SEED`**: Seed for random number initialization  
-- **`TRAINING.LEARNING_RATE`**: Learning rate for optimization  
-- **`TRAINING.TOTAL_EPOCHS`**: Maximum number of training epochs  
-- **`TRAINING.EPOCHS_TIL_SUMMARY`**: Number of epochs before generating result plots  
-- **`TRAINING.LOSS_RECON`**: Loss function for reconstruction (`MSE`, `SSIM`, or `combi`)  
-- **`TRAINING.LOSS_WEIGHT_RECON`**: Weighting of the reconstruction loss  
-- **`TRAINING.LOSS_WEIGHT_SEG`**: Weighting of the segmentation loss  
-- **`TRAINING.INPUT_SLO`**: Whether SLO input is used (`True/False`)  
-
-### **Model Settings**
-- **`MODEL.NUM_LAYERS`**: Number of hidden layers in the INR  
-- **`MODEL.HIDDEN_SIZE`**: Size of hidden network layers  
-- **`MODEL.DROPOUT`**: Dropout rate during training  
-- **`MODEL.ACTIVATION`**: Activation function (`SIREN`, `RELU`, `WIRE`, `FINER`)  
-- **`MODEL.SKIP_CONNECTION`**: Use of skip connections inside the network (`True/False`)  
-- **`MODEL.INPUT_COORD_TO_ALL_LAYERS`**: Pass inputs to all network layers? (`True/False`)  
-- **`MODEL.MODULATION`**: Use a modulated `SIREN` architecture? (`True/False`)  
-- **`MODEL.NUM_CLASSES`**: Number of segmentation labels  
-
-### **Positional Encoding**
-- **`POS_ENCODING`**: Encoding applied to input coordinates (`None`, `FF` (Fourier Features), `Hashgrid`)  
-
-### **Test Settings**
-- **`TEST.LATENT_CODE.INIT_STD`**: Standard deviation for initializing latent codes for test images  
-- **`TEST.TOTAL_EPOCHS`**: Number of training steps to fit the latent code for test images  
-- **`TEST.LEARNING_RATE`**: Learning rate for fitting the latent code  
-
-
+For both the generalizable and the single INR, we provide the configuration used in the paper in the form of YAML files.
 
 ## Qualitative results
 ### Learning of position-dependent shap of the retina
