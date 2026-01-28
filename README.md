@@ -65,6 +65,7 @@ For our code to work, each .npz-container must have the following components:
 - 'seg_vols': The corresponding segmentation images in format \[num_samples, H, W, D\]
 - 'slo_imgs': The corresponding SLO images in format \[num_samples, W, D\]
 - 'subject_names': A list containing identifiers of your data
+- - 'spacing_oct': The corresponding voxel spacings of the OCT scans in the format \[X,Y,Z\]
 
 If you want to use a different data format, the following lines of code need to be adapted:
 - In train_test_geninr.py: Lines 66 - 70, 217 - 235, 246
@@ -79,10 +80,10 @@ additionally perform an evaluation of the models.
 
 To run the scripts use the following commands:
 ```sh
-python train_test_geninr.py ../configs/geninr_config.yaml --gpu 0
+python train_test_geninr.py configs/geninr_config.yaml --gpu 0
 ```
 ```sh
-python train_test_single.py ../configs/singleinr_config.yaml --gpu 0
+python train_test_singleinr.py configs/singleinr_config.yaml --gpu 0
 ```
 
 For both the generalizable and the single INR, we provide the configuration used in the paper in the form of YAML files.
